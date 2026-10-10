@@ -1,2 +1,2 @@
-T,BurnIn,InnovationVariance,ARPolynomial,MAPolynomial,MaxSeriesDifference,MaxShockDifference
-500,500,0.4,[1 -0.8],[1 0.4 0.2],8.88178419700125e-16,0
+T,BurnIn,InnovationVariance,ValidationSeed,ARPolynomial,MAPolynomial,MaxCoefficientRootSeriesDifference,MaxCoefficientRootShockDifference,MaxLoopFilterSeriesDifference,MaxLoopFilterShockDifference
+500,500,0.4,707,[1 -0.8],[1 0.4 0.2],8.88178419700125e-16,0,8.88178419700125e-16,0
