@@ -1,7 +1,4 @@
 Statistic,Value
 Unconditional mean,3
 Mean after burn-in,2.92859143625186
-Theoretical stationary variance,0.625
-Sample variance after burn-in,0.570575691272468
 Burn-in observations,500
-Remaining initial-condition effect,2.02336444030435e-110

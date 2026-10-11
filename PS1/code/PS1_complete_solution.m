@@ -150,9 +150,8 @@ close(figure1);
 
 %% Question 2: Initial condition and burn-in for a stationary AR(1)
 % The requested process has phi=0.6, innovation variance 0.4, and
-% unconditional mean 3.  The starting condition y_0=20 is far above the
-% mean.  Its expected effect after t periods is phi^t*(y_0-mu), which goes
-% to zero because |phi|<1.
+% unconditional mean 3. The starting condition y_0=20 is far above the
+% mean. Its expected effect decreases over time because |phi|<1.
 
 T2 = 500;                 % Number of observations retained at the end.
 burn2 = 500;              % Initial observations discarded as burn-in.
@@ -175,41 +174,31 @@ for t = 1:(T2+burn2)
     y_previous = y2_all(t);
 end
 
-% Discard the first burn2 observations.  The remaining T2 observations are
+% Discard the first burn2 observations. The remaining T2 observations are
 % effectively independent of the arbitrary initial condition.
 y2_stationary = y2_all(burn2+1:burn2+T2);
 
-% The stationary variance of an AR(1) is sigma_e^2/(1-phi^2).
-theoretical_variance2 = sigma2_e2/(1-phi2^2);
-
-% The deterministic remaining effect of y_0 after the burn-in is tiny.
-remaining_initial_effect2 = (phi2^burn2)*(y0_2-mu2);
-
 fprintf('QUESTION 2\n');
-fprintf('Mean of retained post-burn-in observations: %.6f\n',mean(y2_stationary));
-fprintf('Variance of retained observations: %.6f\n',var(y2_stationary));
-fprintf('Theoretical stationary variance: %.6f\n',theoretical_variance2);
-fprintf('Initial-condition effect after burn-in: %.16g\n\n',remaining_initial_effect2);
+fprintf('Mean of retained post-burn-in observations: %.6f\n\n', ...
+    mean(y2_stationary));
 
 % Save the retained sample path and its corresponding innovations.
 question2_path = table((1:T2)',y2_stationary,epsilon2_all(burn2+1:end), ...
     'VariableNames',{'t','y_after_burnin','epsilon'});
 writetable(question2_path,fullfile(output_dir,'question2_stationary_path.csv'));
 
-% Save the quantities useful for discussing the initial-condition problem.
+% Save the main quantities useful for discussing the burn-in.
 question2_summary = table( ...
-    ["Unconditional mean";"Mean after burn-in"; ...
-     "Theoretical stationary variance";"Sample variance after burn-in"; ...
-     "Burn-in observations";"Remaining initial-condition effect"], ...
-    [mu2;mean(y2_stationary);theoretical_variance2;var(y2_stationary); ...
-     burn2;remaining_initial_effect2], ...
+    ["Unconditional mean";"Mean after burn-in";"Burn-in observations"], ...
+    [mu2;mean(y2_stationary);burn2], ...
     'VariableNames',{'Statistic','Value'});
 writetable(question2_summary,fullfile(output_dir,'question2_summary.csv'));
 
-% The first panel emphasizes the rapid movement away from y_0=20.  The
-% conditional expected path is mu+phi^t*(y_0-mu).  The second panel shows
+% The first panel emphasizes the rapid movement away from y_0=20. The
+% conditional expected path is mu+phi^t*(y_0-mu). The second panel shows
 % the observations retained after burn-in.
 figure2 = figure('Visible','off','Color','w','Position',[100 100 1000 650]);
+
 subplot(2,1,1);
 initial_periods = (0:50)';
 expected_initial_path2 = mu2+(phi2.^initial_periods)*(y0_2-mu2);
@@ -232,8 +221,10 @@ xlabel('Retained observation');
 ylabel('y_t');
 title(['Stationary realization after discarding ' num2str(burn2) ' observations']);
 
-exportgraphics(figure2,fullfile(output_dir,'question2_initial_condition_and_burnin.png'), ...
+exportgraphics(figure2, ...
+    fullfile(output_dir,'question2_initial_condition_and_burnin.png'), ...
     'Resolution',300);
+
 close(figure2);
 
 %% Question 3: Empirical distribution of OLS and t-test for phi=0
@@ -555,22 +546,60 @@ rng(606,'twister');
 max_parameterization_difference6 = max(abs(y6_coefficients-y6_roots));
 max_shock_difference6 = max(abs(epsilon6-epsilon6_roots));
 
+% Independent validation against MATLAB's filter command.
+% burn=0 is necessary here because filter also starts from zero initial conditions.
+% Resetting the seed ensures that the loop and filter receive exactly the same innovations.
+validation_seed6 = 707;
+
+rng(validation_seed6,'twister');
+[y6_loop_check,e6_loop_check] = arma_generator_ps1( ...
+    T6,sigma2_e6,AR_polynomial6,MA_polynomial6,'coefficients',0);
+
+rng(validation_seed6,'twister');
+e6_filter_check = sqrt(sigma2_e6)*randn(T6,1);
+y6_filter_check = filter( ...
+    MA_polynomial6,AR_polynomial6,e6_filter_check);
+
+max_loop_filter_shock_difference6 = ...
+    max(abs(e6_loop_check-e6_filter_check));
+
+max_loop_filter_series_difference6 = ...
+    max(abs(y6_loop_check-y6_filter_check));
+
 fprintf('QUESTION 6\n');
 fprintf('Maximum coefficient-root output difference: %.16g\n', ...
     max_parameterization_difference6);
-fprintf('Maximum shock difference under the same seed: %.16g\n\n', ...
+fprintf('Maximum shock difference under the same seed: %.16g\n', ...
     max_shock_difference6);
+fprintf('Maximum loop-filter shock difference: %.16g\n', ...
+    max_loop_filter_shock_difference6);
+fprintf('Maximum loop-filter series difference: %.16g\n\n', ...
+    max_loop_filter_series_difference6);
 
-question6_series = table((1:T6)',y6_coefficients,epsilon6,y6_roots, ...
-    'VariableNames',{'t','y_from_coefficients','epsilon','y_from_roots'});
-writetable(question6_series,fullfile(output_dir,'question6_arma_example.csv'));
+question6_series = table( ...
+    (1:T6)',y6_coefficients,epsilon6,y6_roots, ...
+    'VariableNames', ...
+    {'t','y_from_coefficients','epsilon','y_from_roots'});
 
-question6_summary = table(T6,burn6,sigma2_e6, ...
+writetable(question6_series, ...
+    fullfile(output_dir,'question6_arma_example.csv'));
+
+question6_summary = table( ...
+    T6,burn6,sigma2_e6,validation_seed6, ...
     string(mat2str(AR_used6)),string(mat2str(MA_used6)), ...
     max_parameterization_difference6,max_shock_difference6, ...
-    'VariableNames',{'T','BurnIn','InnovationVariance','ARPolynomial', ...
-    'MAPolynomial','MaxSeriesDifference','MaxShockDifference'});
-writetable(question6_summary,fullfile(output_dir,'question6_summary.csv'));
+    max_loop_filter_series_difference6, ...
+    max_loop_filter_shock_difference6, ...
+    'VariableNames',{ ...
+    'T','BurnIn','InnovationVariance','ValidationSeed', ...
+    'ARPolynomial','MAPolynomial', ...
+    'MaxCoefficientRootSeriesDifference', ...
+    'MaxCoefficientRootShockDifference', ...
+    'MaxLoopFilterSeriesDifference', ...
+    'MaxLoopFilterShockDifference'});
+
+writetable(question6_summary, ...
+    fullfile(output_dir,'question6_summary.csv'));
 
 figure7 = figure('Visible','off','Color','w','Position',[100 100 1000 650]);
 subplot(2,1,1);
