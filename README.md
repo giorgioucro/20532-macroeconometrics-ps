@@ -13,32 +13,13 @@ This repository contains MATLAB code and generated outputs for the problem sets 
     ├── code/
     │   ├── PS1_complete_solution.m
     │   └── arma_generator_ps1.m
+    ├── explanatory_note.pdf
     └── outputs/
-        ├── PS1_all_results.mat
-        ├── question1_loop_vs_filter.png
-        ├── question1_simulated_series.csv
-        ├── question1_summary.csv
-        ├── question2_initial_condition_and_burnin.png
-        ├── question2_stationary_path.csv
-        ├── question2_summary.csv
-        ├── question3_monte_carlo_draws.csv
-        ├── question3_ols_distribution.png
-        ├── question3_summary.csv
-        ├── question4_distributions_by_sample_size.png
-        ├── question4_monte_carlo_draws.csv
-        ├── question4_summary.csv
-        ├── question5_distributions_by_sample_size.png
-        ├── question5_mean_convergence.png
-        ├── question5_monte_carlo_draws.csv
-        ├── question5_summary.csv
-        ├── question6_arma_example.csv
-        ├── question6_arma_example.png
-        └── question6_summary.csv
 ```
 
 ## Problem Set 1
 
-The main script is `ps1/code/PS1_complete_solution.m`.
+The main script is `ps1/code/PS1_complete_solution.m`. A companion explanatory note is available at `ps1/explanatory_note.pdf`.
 
 ### Question 1 — Simulation of an AR(1)
 
