@@ -19,22 +19,10 @@ This repository contains MATLAB solutions, explanatory notes, and generated resu
     ├── explanatory_note.pdf
     ├── code/
     │   └── PS2_complete_solution.m
-    └── output/
-        ├── Romer_Romer.xlsx
-        ├── question1_unit_root_distributions.png
-        ├── question2_four_cases.png
-        ├── question3_irf_comparison.png
-        ├── question1_*.csv      # Four unit-root summary tables
-        ├── question2_spurious_summary.csv
-        ├── question3_irf_summary.csv
-        ├── question4_granger_tests.csv
-        ├── question1_simulations.mat
-        ├── question2_simulations.mat
-        ├── question3_simulations.mat
-        └── question4_var_results.mat
+    └── output/                 # Input data, figures, CSV tables and MAT results
 ```
 
-The tree shows the files currently included in the repository; wildcard entries group related files. See [Running the scripts](#running-the-scripts) for the locations used when regenerating results.
+The tree summarizes the repository structure. See [Running the scripts](#running-the-scripts) for the locations used when regenerating results.
 
 ## Problem Set 1
 
